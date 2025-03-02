@@ -1,16 +1,26 @@
 import random
 from argparse import ArgumentParser
 import urllib
+import cowsay
 
-def ask(prompt: str, valid: list[str] = None) -> str:
+def ask(prompt: str, valid: list[str] = None, random_cow: bool = False) -> str:
+    if random_cow == False:
+        with open("mycow.cow", "r") as f:
+            print(cowsay.cowsay(prompt, cowfile=cowsay.read_dot_cow(f)))
+    else:
+        print(cowsay.cowsay(prompt, cow=random.choice(list(cowsay.list_cows()))))
     while True:
-        word = input(prompt)
+        word = input()
         if word in valid or valid is None:
             return word
         print('Ivalid word. Try again.')
 
-def inform(format_string: str, bulls: int, cows: int) -> None:
-    print(format_string.format(bulls, cows))
+def inform(format_string: str, bulls: int, cows: int, random_cow: bool = False) -> None:
+    if random_cow == False:
+        with open("mycow.cow", "r") as f:
+            print(cowsay.cowsay(format_string.format(bulls, cows), cowfile=cowsay.read_dot_cow(f)))
+    else:
+        print(cowsay.cowsay(format_string.format(bulls, cows), cow=random.choice(list(cowsay.list_cows()))))
 
 def bullcows(guess: str, answer: str) -> tuple[int, int]:
     word_len = len(guess)
@@ -29,9 +39,12 @@ def gameplay(ask: callable, inform: callable, words: list[str]) -> int:
     attempts = 0
     while True:
         attempts += 1
-        word = ask('Введите слово: ', words)
+        if attempts == 1:
+            word = ask('Введите слово: ', words)
+        else:
+            word = ask('Введите слово: ', words, True)
         bulls, cows = bullcows(word, answer)
-        inform("Быки: {}, Коровы: {}", bulls, cows)
+        inform("Быки: {}, Коровы: {}", bulls, cows, True)
         if word == answer:
             return attempts
         
